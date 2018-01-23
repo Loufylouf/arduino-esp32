@@ -307,7 +307,7 @@ bool WiFiSTAClass::disconnect(bool wifioff, bool eraseIPConfig)
             info.ip.addr        = 0;
             info.gw.addr        = 0;
             info.netmask.addr   = 0;
-            err = tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+            esp_err_t err = tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
             if(err != ERR_OK)
                 log_e("STA IP could not be configured! Error: %d", err);
 
