@@ -43,7 +43,7 @@ public:
     bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
 
     bool reconnect();
-    bool disconnect(bool wifioff = false);
+    bool disconnect(bool wifioff = false, bool eraseIPConfig = true);
 
     bool isConnected();
 

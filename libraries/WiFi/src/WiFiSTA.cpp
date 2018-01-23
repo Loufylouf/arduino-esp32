@@ -281,7 +281,7 @@ bool WiFiSTAClass::reconnect()
  * @param wifioff
  * @return  one value of wl_status_t enum
  */
-bool WiFiSTAClass::disconnect(bool wifioff)
+bool WiFiSTAClass::disconnect(bool wifioff, bool eraseIPConfig)
 {
     bool ret;
     wifi_config_t conf;
@@ -291,8 +291,31 @@ bool WiFiSTAClass::disconnect(bool wifioff)
     WiFi.getMode();
     esp_wifi_start();
     esp_wifi_set_config(WIFI_IF_STA, &conf);
-    ret = esp_wifi_disconnect() == ESP_OK;
 
+    // Erase the IP config if asked to do so (true by default)
+    if (eraseIPConfig)
+    {
+        ip_addr_t d;
+        d.type              = IPADDR_TYPE_V4;
+        d.u_addr.ip4.addr   = 0 ; 
+        dns_setserver(0, &d);
+        dns_setserver(1, &d);
+
+        if ( _useStaticIp )
+        {
+            tcpip_adapter_ip_info_t info;
+            info.ip.addr        = 0;
+            info.gw.addr        = 0;
+            info.netmask.addr   = 0;
+            err = tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+            if(err != ERR_OK)
+                log_e("STA IP could not be configured! Error: %d", err);
+
+            _useStaticIp = false ; 
+        }
+    }
+
+    ret = esp_wifi_disconnect() == ESP_OK;
     if(wifioff) {
         WiFi.enableSTA(false);
     }
